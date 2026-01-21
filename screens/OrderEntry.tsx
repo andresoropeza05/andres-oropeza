@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MOCK_PRODUCTS } from '../constants';
 import { Product } from '../types';
 import { parseVoiceOrder } from '../services/geminiService';
@@ -11,18 +11,17 @@ interface OrderEntryProps {
 }
 
 const OrderEntry: React.FC<OrderEntryProps> = ({ isOffline }) => {
+  const navigate = useNavigate();
   const [cart, setCart] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         const localProducts = await getAllData<Product>('products');
-        // Combinamos productos locales con los mocks, evitando duplicados por ID
         const combined = [...localProducts];
         MOCK_PRODUCTS.forEach(mp => {
           if (!combined.find(p => p.id === mp.id)) {
@@ -45,22 +44,16 @@ const OrderEntry: React.FC<OrderEntryProps> = ({ isOffline }) => {
     ));
   };
 
-  const clearCart = () => {
-    setCart(cart.map(p => ({ ...p, qty: 0 })));
-    setShowClearConfirm(false);
-  };
-
   const total = cart.reduce((acc, p) => acc + (p.price * p.qty), 0);
   const totalUnits = cart.reduce((acc, p) => acc + p.qty, 0);
 
   const handleSimulatedVoiceCapture = async () => {
-    const simulatedText = "Dame 10 jamones virginia y 5 salchichas viena por favor";
+    const simulatedText = "Agregame 3 jamones virginia y 2 yoghurts de piña";
     setTranscript(simulatedText);
     setIsProcessing(true);
     
     try {
       const parsed = await parseVoiceOrder(simulatedText);
-      
       setCart(prev => {
         const newCart = [...prev];
         parsed.forEach((item: any) => {
@@ -78,140 +71,157 @@ const OrderEntry: React.FC<OrderEntryProps> = ({ isOffline }) => {
         setIsProcessing(false);
         setIsAssistantOpen(false);
         setTranscript("");
-      }, 1500);
+      }, 1200);
     } catch (error) {
       setIsProcessing(false);
-      alert("Error al procesar el pedido con IA");
+      alert("Error en procesamiento de voz");
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-screen bg-white">
-    <div className="w-8 h-8 border-4 border-[#22c3b6] border-t-transparent rounded-full animate-spin"></div>
-  </div>;
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center h-screen bg-slate-50">
+      <div className="w-12 h-12 border-4 border-[#22c3b6] border-t-transparent rounded-full animate-spin"></div>
+      <p className="mt-4 font-bold text-slate-400 animate-pulse">Cargando Catálogo Sigma...</p>
+    </div>
+  );
 
   return (
-    <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-space">
-      <header className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/10 shadow-sm">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <Link to="/" className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#22c3b6]/10 text-[#22c3b6] hover:bg-[#22c3b6]/20 transition-colors">
-              <span className="material-symbols-outlined">arrow_back</span>
-            </Link>
-            <div>
-              <h1 className="text-lg font-bold leading-tight">Toma de Pedido</h1>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-[#22c3b6] rounded-full animate-pulse"></span>
-                <p className="text-[10px] font-bold text-[#22c3b6] uppercase tracking-widest">Asistente Sigma AI</p>
-              </div>
-            </div>
+    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-background-dark font-manrope">
+      <header className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-white/10">
+        <div className="flex items-center justify-between px-5 py-4">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <div className="text-center">
+            <h1 className="text-sm font-black uppercase tracking-widest text-[#0d3359] dark:text-white">Toma de Pedido</h1>
+            <p className="text-[10px] font-bold text-[#22c3b6] uppercase">Venta en Ruta</p>
           </div>
-          <div className="flex items-center gap-2">
-            {total > 0 && (
-              <button 
-                onClick={() => setShowClearConfirm(true)}
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-[#D8203E] hover:bg-red-100 transition-colors"
-              >
-                <span className="material-symbols-outlined text-xl">delete_sweep</span>
-              </button>
-            )}
-            <button 
-              onClick={() => setIsAssistantOpen(true)}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0d3359] text-white shadow-lg hover:shadow-[#0d3359]/30 active:scale-90 transition-all"
-            >
-              <span className="material-symbols-outlined">mic</span>
-            </button>
-          </div>
-        </div>
-        <div className="bg-[#22c3b6]/5 dark:bg-[#22c3b6]/10 px-4 py-3 flex items-center justify-between border-b border-[#22c3b6]/10">
-          <div>
-            <span className="text-[10px] font-black text-[#22c3b6]/60 uppercase">CLIENTE ACTIVO</span>
-            <div className="flex items-center gap-2">
-              <span className="bg-[#22c3b6] text-white text-[10px] font-black px-1.5 py-0.5 rounded leading-none">#4099238</span>
-              <h2 className="text-sm font-bold truncate max-w-[180px]">ABARROTES "LA BENDICIÓN"</h2>
-            </div>
-          </div>
-          <div className="text-right">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">RUTA</span>
-            <span className="text-xs font-black text-[#0d3359] dark:text-white">MEX-V102</span>
-          </div>
+          <button 
+            onClick={() => setIsAssistantOpen(true)}
+            className="w-11 h-11 flex items-center justify-center rounded-full bg-[#0d3359] text-white shadow-lg shadow-[#0d3359]/30 active:scale-90 transition-all"
+          >
+            <span className="material-symbols-outlined">mic</span>
+          </button>
         </div>
       </header>
 
-      <main className="p-4 space-y-3 pb-48">
+      <main className="p-5 space-y-4 pb-48">
+        {/* Search */}
         <div className="relative group">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#22c3b6] transition-colors">search</span>
-          <input className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 ring-[#22c3b6]/30 transition-all outline-none" placeholder="Buscar por nombre o código..." />
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#22c3b6] transition-colors">search</span>
+          <input className="w-full bg-white dark:bg-slate-800 border-0 rounded-2xl pl-12 pr-4 py-4 text-sm font-medium shadow-sm focus:ring-2 ring-[#22c3b6]/50 outline-none" placeholder="Buscar producto Sigma..." />
         </div>
 
-        <div className="grid gap-3">
+        {/* Product List */}
+        <div className="space-y-3">
           {cart.map(item => (
-            <div key={item.id} className={`p-4 bg-white dark:bg-slate-900 rounded-2xl border transition-all ${item.qty > 0 ? 'border-[#22c3b6] shadow-sm' : 'border-slate-200 dark:border-white/10'}`}>
-              <div className="flex justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-[9px] font-black text-[#22c3b6] bg-[#22c3b6]/10 px-1.5 py-0.5 rounded-full">{item.id}</span>
-                    <h3 className="font-bold text-sm leading-tight text-slate-800 dark:text-slate-100">{item.name}</h3>
+            <div key={item.id} className={`bg-white dark:bg-slate-900 rounded-3xl p-5 border transition-all duration-300 ${item.qty > 0 ? 'border-[#22c3b6] shadow-lg shadow-[#22c3b6]/10' : 'border-transparent shadow-sm'}`}>
+              <div className="flex flex-col">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex-1 pr-4">
+                    <h3 className="text-base font-black text-slate-800 dark:text-slate-100 leading-tight">{item.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CÓDIGO: {item.id}</span>
+                      {item.qty > 0 && (
+                        <span className="bg-[#22c3b6] text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">
+                          En Carrito
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Unidad: {item.unit}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-black text-[#22c3b6]">${item.price.toFixed(2)}</p>
-                  {item.qty > 0 && <p className="text-[10px] font-bold text-slate-500 mt-1">${(item.price * item.qty).toLocaleString()} Subtotal</p>}
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 p-1 rounded-xl border border-slate-100 dark:border-white/5">
-                  <button 
-                    onClick={() => updateQty(item.id, -1)}
-                    className="w-9 h-9 bg-white dark:bg-slate-700 rounded-lg shadow-sm text-slate-600 dark:text-slate-300 flex items-center justify-center active:scale-90 transition-transform"
-                  >
-                    <span className="material-symbols-outlined text-lg">remove</span>
-                  </button>
-                  <div className="px-1 text-center min-w-[3.5rem]">
-                    <span className="font-black text-lg block leading-none">{item.qty}</span>
+                  <div className="text-right">
+                    <p className="text-lg font-black text-[#22c3b6]">${item.price.toFixed(2)}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Por {item.unit}</p>
                   </div>
-                  <button 
-                    onClick={() => updateQty(item.id, 1)}
-                    className="w-9 h-9 bg-[#22c3b6] rounded-lg shadow-sm text-white flex items-center justify-center active:scale-90 transition-transform"
-                  >
-                    <span className="material-symbols-outlined text-lg">add</span>
-                  </button>
                 </div>
-                {item.qty > 0 && (
-                  <button onClick={() => updateQty(item.id, -item.qty)} className="text-[#D8203E] bg-red-50 p-2 rounded-lg transition-colors active:scale-90">
-                    <span className="material-symbols-outlined">delete</span>
-                  </button>
-                )}
+                
+                <div className="flex items-center justify-between mt-4">
+                  <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 rounded-2xl p-1.5 border border-slate-100 dark:border-white/5">
+                    <button 
+                      onClick={() => updateQty(item.id, -1)}
+                      className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-700 rounded-xl text-slate-400 active:scale-75 transition-transform shadow-sm"
+                    >
+                      <span className="material-symbols-outlined text-xl">remove</span>
+                    </button>
+                    <span className="w-12 text-center text-lg font-black">{item.qty}</span>
+                    <button 
+                      onClick={() => updateQty(item.id, 1)}
+                      className="w-10 h-10 flex items-center justify-center bg-[#22c3b6] rounded-xl text-white active:scale-75 transition-transform shadow-md shadow-[#22c3b6]/20"
+                    >
+                      <span className="material-symbols-outlined text-xl">add</span>
+                    </button>
+                  </div>
+                  
+                  {item.qty > 0 && (
+                    <div className="text-right">
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Subtotal</p>
+                      <p className="text-xl font-black text-[#0d3359] dark:text-white">
+                        ${(item.price * item.qty).toFixed(2)}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
       </main>
 
-      <footer className="fixed bottom-0 inset-x-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl p-4 border-t border-slate-200 dark:border-white/10 shadow-2xl rounded-t-[2.5rem] z-40">
-        <div className="grid grid-cols-3 gap-3 mb-5">
-          <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/5">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Items</p>
-            <p className="text-lg font-black text-[#0d3359] dark:text-white">{cart.filter(p => p.qty > 0).length}</p>
+      {/* Persistent Bottom Summary */}
+      <div className="fixed bottom-0 inset-x-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl p-6 border-t border-slate-200 dark:border-white/10 shadow-[0_-20px_40px_rgba(0,0,0,0.05)] rounded-t-[3rem] z-50">
+        <div className="flex items-center justify-between mb-6 px-2">
+          <div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Total Pedido</p>
+            <p className="text-3xl font-black text-[#0d3359] dark:text-[#22c3b6] tracking-tighter">${total.toLocaleString()}</p>
           </div>
-          <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/5">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Unds</p>
-            <p className="text-lg font-black text-[#0d3359] dark:text-white">{totalUnits}</p>
-          </div>
-          <div className="text-center p-3 bg-[#22c3b6]/10 rounded-2xl border border-[#22c3b6]/20">
-            <p className="text-[9px] font-black text-[#22c3b6] uppercase tracking-widest mb-1">Total</p>
-            <p className="text-lg font-black text-[#22c3b6]">${total.toLocaleString()}</p>
+          <div className="text-right">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Unidades</p>
+            <p className="text-lg font-black text-slate-800 dark:text-white">{totalUnits}</p>
           </div>
         </div>
         <Link 
           to="/simplified-collection" 
           state={{ total }}
-          className={`w-full h-16 rounded-2xl flex items-center justify-center gap-3 text-white font-black text-lg shadow-xl transition-all active:scale-[0.98] ${total > 0 ? 'bg-[#22c3b6] shadow-[#22c3b6]/30' : 'bg-slate-300 pointer-events-none'}`}
+          className={`w-full h-16 rounded-2xl flex items-center justify-center gap-3 text-white font-black text-lg transition-all active:scale-95 shadow-2xl ${total > 0 ? 'bg-[#22c3b6] shadow-[#22c3b6]/40' : 'bg-slate-300 pointer-events-none'}`}
         >
-          <span className="material-symbols-outlined text-2xl">point_of_sale</span> FINALIZAR VENTA
+          <span className="material-symbols-outlined">payments</span> FINALIZAR VENTA
         </Link>
-      </footer>
-      {/* ... (Modals omitted for brevity, same as previous) ... */}
+      </div>
+
+      {/* AI Assistant Modal */}
+      {isAssistantOpen && (
+        <div className="fixed inset-0 z-[100] bg-[#0d3359]/60 backdrop-blur-xl flex items-end p-4 animate-in fade-in duration-300">
+          <div className="w-full bg-white dark:bg-slate-900 rounded-[3rem] p-8 shadow-2xl animate-in slide-in-from-bottom duration-500">
+            <div className="flex justify-center mb-6">
+              <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-1000 ${isProcessing ? 'bg-[#22c3b6] scale-110 shadow-[0_0_40px_#22c3b6]' : 'bg-slate-100 animate-pulse text-[#0d3359]'}`}>
+                <span className={`material-symbols-outlined text-4xl ${isProcessing ? 'text-white animate-spin' : ''}`}>
+                  {isProcessing ? 'data_thresholding' : 'mic'}
+                </span>
+              </div>
+            </div>
+            
+            <h3 className="text-2xl font-black text-center text-slate-800 dark:text-white mb-2">
+              {isProcessing ? 'Procesando Pedido...' : 'Te escucho...'}
+            </h3>
+            <p className="text-slate-500 text-center text-sm font-medium px-4 mb-8 italic">
+              {transcript || '"Agrégame 5 jamones virginia y 2 quesos panela"'}
+            </p>
+
+            {!isProcessing ? (
+              <div className="grid grid-cols-2 gap-4">
+                <button onClick={() => setIsAssistantOpen(false)} className="py-4 rounded-2xl font-bold bg-slate-100 text-slate-500 active:scale-95 transition-all">Cancelar</button>
+                <button onClick={handleSimulatedVoiceCapture} className="py-4 rounded-2xl font-bold bg-[#22c3b6] text-white shadow-lg active:scale-95 transition-all">Simular Voz</button>
+              </div>
+            ) : (
+              <div className="flex justify-center space-x-2">
+                 <div className="w-2 h-2 bg-[#22c3b6] rounded-full animate-bounce"></div>
+                 <div className="w-2 h-2 bg-[#22c3b6] rounded-full animate-bounce delay-100"></div>
+                 <div className="w-2 h-2 bg-[#22c3b6] rounded-full animate-bounce delay-200"></div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

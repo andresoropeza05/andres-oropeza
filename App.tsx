@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './screens/Dashboard';
-import OrderEntry from './screens/OrderEntry';
-import SimplifiedCollection from './screens/SimplifiedCollection';
-import ReceiptTicket from './screens/ReceiptTicket';
-import SalesHistory from './screens/SalesHistory';
-import RoutePlanning from './screens/RoutePlanning';
-import NavigationMap from './screens/NavigationMap';
-import ClientCreation from './screens/ClientCreation';
-import ProductCreation from './screens/ProductCreation';
-import Profile from './screens/Profile';
+import Dashboard from './screens/Dashboard.tsx';
+import OrderEntry from './screens/OrderEntry.tsx';
+import SimplifiedCollection from './screens/SimplifiedCollection.tsx';
+import ReceiptTicket from './screens/ReceiptTicket.tsx';
+import SalesHistory from './screens/SalesHistory.tsx';
+import RoutePlanning from './screens/RoutePlanning.tsx';
+import NavigationMap from './screens/NavigationMap.tsx';
+import ClientCreation from './screens/ClientCreation.tsx';
+import ProductCreation from './screens/ProductCreation.tsx';
+import Profile from './screens/Profile.tsx';
 
 const App: React.FC = () => {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);

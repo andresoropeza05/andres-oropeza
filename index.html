@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Epilogue:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script>
+        // Shim para evitar error de "process is not defined" en el navegador
+        window.process = window.process || { env: { API_KEY: "" } };
+        
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -60,7 +63,6 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
     <div id="root"></div>
-    <!-- PUNTO DE ENTRADA CRUCIAL PARA EVITAR EL 404/PANTALLA BLANCA -->
     <script type="module" src="index.tsx"></script>
 </body>
 </html>

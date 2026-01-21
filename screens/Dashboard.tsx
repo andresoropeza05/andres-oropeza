@@ -11,110 +11,82 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ isOffline, toggleOffline }) => {
   return (
-    <div className="flex flex-col min-h-screen pb-32 bg-[#f8fafc] dark:bg-background-dark">
-      <Header title="Sigma Alimentos" showBack={false} isOffline={isOffline} />
+    <div className="flex flex-col min-h-screen pb-32 bg-[#f8fafc] dark:bg-background-dark font-manrope">
+      <Header title="Sigma Mobile" showBack={false} isOffline={isOffline} />
       
       {isOffline && (
-        <div className="bg-[#D8203E] text-white text-[10px] font-black text-center py-1.5 uppercase tracking-widest shadow-inner">
-          <div className="flex items-center justify-center gap-2">
-            <span className="material-symbols-outlined text-[14px]">wifi_off</span>
-            TRABAJANDO FUERA DE LÍNEA
-          </div>
+        <div className="bg-[#D8203E] text-white text-[10px] font-black text-center py-1.5 uppercase tracking-widest animate-pulse">
+          Modo Sin Conexión Activado
         </div>
       )}
 
-      <div className="relative overflow-hidden bg-[#0d3359] pt-8 pb-12 px-6">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-        <div className="relative z-10 flex items-start justify-between">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-white/10 rounded-full border border-white/10">
-              <span className="w-1.5 h-1.5 bg-[#22c3b6] rounded-full animate-pulse"></span>
-              <span className="text-[9px] font-bold text-white/80 uppercase tracking-widest">Vendedor Activo</span>
+      {/* Hero Section / User Info */}
+      <div className="bg-[#0d3359] pt-8 pb-14 px-6 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-[#22c3b6] opacity-10 blur-[60px] rounded-full"></div>
+        <div className="relative z-10">
+          <p className="text-[#22c3b6] text-[10px] font-bold uppercase tracking-widest mb-1">Bienvenido de nuevo</p>
+          <h2 className="text-2xl font-black text-white leading-tight">Andrés Vera</h2>
+          <div className="flex gap-4 mt-4">
+            <div className="bg-white/10 backdrop-blur-md px-3 py-2 rounded-2xl border border-white/10">
+              <p className="text-[8px] text-white/50 uppercase font-bold">Ruta Actual</p>
+              <p className="text-sm font-bold text-white">MEX-V102</p>
             </div>
-            <div>
-              <h2 className="text-2xl font-black text-white leading-tight">Andrés Oropeza Vera</h2>
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[#22c3b6] text-sm">badge</span>
-                  <span className="text-xs font-bold text-white/60">ID: 284910</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[#22c3b6] text-sm">local_shipping</span>
-                  <span className="text-xs font-bold text-white/60">Ruta: V-102</span>
-                </div>
-              </div>
+            <div className="bg-white/10 backdrop-blur-md px-3 py-2 rounded-2xl border border-white/10">
+              <p className="text-[8px] text-white/50 uppercase font-bold">Clientes</p>
+              <p className="text-sm font-bold text-white">12 / 18</p>
             </div>
           </div>
-          <Link to="/profile" className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 flex items-center justify-center text-white active:scale-90 transition-transform">
-            <span className="material-symbols-outlined text-2xl">person_outline</span>
-          </Link>
         </div>
       </div>
 
-      <main className="px-5 -mt-6 relative z-20 space-y-4">
-        {/* Acción Principal: Toma de Pedidos */}
+      <main className="px-5 -mt-8 relative z-20 space-y-6">
+        {/* Acceso rápido - Toma de Pedido */}
         <Link 
           to="/order-entry" 
-          className="block bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-white/5 overflow-hidden active:scale-[0.98] transition-all"
+          className="block bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-white/5 active:scale-95 transition-all"
         >
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-[#22c3b6]/10 text-[#22c3b6] flex items-center justify-center">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-2xl bg-[#22c3b6] text-white flex items-center justify-center shadow-lg shadow-[#22c3b6]/40">
               <span className="material-symbols-outlined text-4xl">add_shopping_cart</span>
             </div>
-            <span className="material-symbols-outlined text-slate-300">arrow_forward_ios</span>
-          </div>
-          <div>
-            <h3 className="text-xl font-black text-slate-800 dark:text-white leading-tight">Nueva Venta</h3>
-            <p className="text-sm text-slate-500 mt-1 italic">Iniciar toma de pedido con asistente IA</p>
+            <div className="flex-1">
+              <h3 className="text-xl font-black text-slate-800 dark:text-white">Nueva Venta</h3>
+              <p className="text-xs text-slate-500 font-medium italic">Asistente de Pedidos Sigma AI</p>
+            </div>
+            <span className="material-symbols-outlined text-[#22c3b6]">arrow_forward_ios</span>
           </div>
         </Link>
 
+        {/* Grid de acciones secundarias */}
         <div className="grid grid-cols-2 gap-4">
-          {/* Alta de Clientes */}
-          <Link 
-            to="/client-creation" 
-            className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-white/5 flex flex-col gap-4 shadow-md active:scale-[0.98] transition-all"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-[#0d3359] dark:text-blue-400 flex items-center justify-center">
-              <span className="material-symbols-outlined text-3xl">person_add</span>
+          <Link to="/route-planning" className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-md active:scale-95 transition-all">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 mb-4 flex items-center justify-center">
+              <span className="material-symbols-outlined">map</span>
             </div>
-            <div>
-              <h4 className="font-black text-slate-800 dark:text-white leading-tight">Alta Clientes</h4>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Nuevos prospectos</p>
-            </div>
+            <h4 className="font-bold text-slate-800 dark:text-white">Mi Ruta</h4>
+            <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Navegación GPS</p>
           </Link>
-
-          {/* Alta de Productos */}
-          <Link 
-            to="/product-creation" 
-            className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-white/5 flex flex-col gap-4 shadow-md active:scale-[0.98] transition-all"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-900/20 text-orange-500 flex items-center justify-center">
-              <span className="material-symbols-outlined text-3xl">inventory</span>
+          
+          <Link to="/sales-history" className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-md active:scale-95 transition-all">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 mb-4 flex items-center justify-center">
+              <span className="material-symbols-outlined">history</span>
             </div>
-            <div>
-              <h4 className="font-black text-slate-800 dark:text-white leading-tight">Alta Productos</h4>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Catálogo de stock</p>
-            </div>
+            <h4 className="font-bold text-slate-800 dark:text-white">Historial</h4>
+            <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Ventas del día</p>
           </Link>
         </div>
 
-        {/* Botón de Sincronización (Mantenido por utilidad operativa básica) */}
-        <button 
-          onClick={() => alert("Sincronizando datos...")}
-          className="w-full bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-white/5 flex items-center justify-between shadow-md active:scale-[0.98] transition-all"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center">
-              <span className="material-symbols-outlined text-3xl">sync</span>
-            </div>
-            <div className="text-left">
-              <h4 className="font-black text-slate-800 dark:text-white leading-tight">Sincronizar</h4>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Subir cambios locales</p>
-            </div>
-          </div>
-          <div className="w-2 h-2 bg-[#D8203E] rounded-full animate-pulse mr-2"></div>
-        </button>
+        {/* Otros servicios */}
+        <div className="grid grid-cols-2 gap-4">
+          <Link to="/client-creation" className="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-2xl flex items-center gap-3">
+             <span className="material-symbols-outlined text-[#0d3359] dark:text-[#22c3b6]">person_add</span>
+             <span className="text-xs font-bold uppercase">Alta Cliente</span>
+          </Link>
+          <Link to="/product-creation" className="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-2xl flex items-center gap-3">
+             <span className="material-symbols-outlined text-[#0d3359] dark:text-[#22c3b6]">inventory_2</span>
+             <span className="text-xs font-bold uppercase">Catálogo</span>
+          </Link>
+        </div>
       </main>
       
       <BottomNav />
