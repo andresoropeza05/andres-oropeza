@@ -1,0 +1,9 @@
+{
+  "name": "Sigma Alimentos - Sistema de Venta en Ruta",
+  "description": "Una aplicación empresarial robusta para la gestión de ventas en ruta, pedidos, cobranza y logística de Sigma Alimentos, con integración de IA para asistencia en pedidos.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
